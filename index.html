@@ -3,133 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ILM MIZAN | if-else: Tanlov Quvvati</title>
+    <title>ILM MIZAN | if-else Interaktiv Simulyator</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        :root { --dark: #020617; --accent: #f59e0b; --gold: #c5a022; --bg: #f8fafc; --text: #334155; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--text); padding: 10px; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        :root { --main: #020617; --accent: #f59e0b; --gold: #c5a022; --bg: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #1e293b; }
+        .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
-        .mizan-header { text-align: center; border-bottom: 3px solid var(--accent); padding-bottom: 15px; margin-bottom: 30px; }
-        .mizan-logo { font-size: 13px; letter-spacing: 5px; color: var(--gold); font-weight: 800; }
-        h1 { font-size: 32px; color: var(--dark); margin: 5px 0; }
+        /* Brand Header */
+        header { text-align: center; padding: 20px 0; border-bottom: 4px solid var(--accent); margin-bottom: 30px; background: var(--main); color: white; border-radius: 0 0 20px 20px; }
+        .logo { font-size: 12px; letter-spacing: 4px; color: var(--gold); font-weight: 900; }
 
-        /* The Dual View */
-        .lesson-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px; }
-        @media (min-width: 768px) { .lesson-grid { grid-template-columns: 1.2fr 0.8fr; } }
+        /* Dashboard Layout */
+        .dashboard { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 900px) { .dashboard { grid-template-columns: 450px 1fr; } }
+
+        /* Left Column: Logic Control */
+        .logic-panel { display: flex; flex-direction: column; gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         
-        .panel { border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .code-box { background: #1e1e1e; color: #cbd5e1; padding: 25px; font-family: 'Fira Code', monospace; line-height: 1.6; font-size: 14px; }
-        .trans-view { background: white; padding: 25px; border: 1px solid #e2e8f0; position: relative; }
-        
-        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
-        .toggle-btn { background: var(--dark); color: white; border: none; padding: 6px 18px; border-radius: 20px; cursor: pointer; font-size: 11px; }
+        .code-editor { background: #1e1e1e; color: #dcdcdc; padding: 20px; border-radius: 15px; font-family: 'Fira Code', monospace; font-size: 14px; position: relative; }
+        .variable-input { background: #2d3748; color: #fbbf24; border: 1px solid #4a5568; padding: 2px 8px; border-radius: 4px; font-weight: bold; width: 80px; text-align: center; }
 
-        /* 3D Scene Area */
-        .viz-box { background: #e2e8f0; height: 500px; border-radius: 24px; margin: 30px 0; overflow: hidden; position: relative; }
-        .scene-label { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; z-index: 10; }
-        
-        /* Multiple model support using separate viewers and JS placement */
-        model-viewer { width: 100%; height: 100%; }
-        #traffic-light { position: absolute; right: 20px; top: 50px; width: 300px; height: 300px; --poster-color: transparent;}
-        #robot { position: absolute; left: 100px; bottom: 10px; width: 400px; height: 400px; --poster-color: transparent;}
+        .translation-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .btn-toggle { background: var(--main); color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 11px; }
 
-        /* Defs Section */
-        .definitions { background: white; padding: 25px; border-radius: 20px; margin-top: 30px; }
-        .definitions h2 { color: var(--dark); margin-top: 0; }
-        .def-item { border-bottom: 1px solid #f1f5f9; padding: 15px 0; }
-        .def-item b { color: var(--gold); font-size: 16px; display: block;}
+        /* Right Column: 3D Visualization */
+        .viz-window { background: #cbd5e0; height: 600px; border-radius: 24px; position: relative; overflow: hidden; border: 5px solid white; }
+        .status-overlay { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 40px; font-size: 14px; z-index: 10; display: flex; align-items: center; gap: 10px; }
+        .indicator { width: 12px; height: 12px; border-radius: 50%; background: grey; }
 
-        .footer { text-align: center; margin-top: 50px; color: #94a3b8; font-size: 13px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+        /* 3D Model Positions */
+        #crosswalk { width: 100%; height: 100%; }
+        #robot { position: absolute; bottom: 50px; left: 50px; width: 300px; height: 300px; transition: transform 2s linear; }
+        #traffic-light { position: absolute; bottom: 150px; right: 50px; width: 250px; height: 250px; }
+
+        /* Detailed Definitions */
+        .definitions { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .def-card { background: white; padding: 20px; border-radius: 15px; border-top: 4px solid var(--gold); }
+        .def-card b { color: var(--main); font-size: 18px; }
+
         .hide { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="mizan-header">
-        <div class="mizan-logo">ILM MIZAN ARCHIVE</div>
-        <h1>C# if-else Operatorlari</h1>
-        <p>Kod orqali tanlov qilish san'ati</p>
+<div class="app-container">
+    <header>
+        <div class="logo">ILM MIZAN • META LEARNING</div>
+        <h1>Mavzu: if-else | Qarorlar chorrahasi</h1>
     </header>
 
-    <section style="background: white; padding: 20px; border-radius: 16px; margin-bottom: 30px; border-left: 8px solid var(--accent);">
-        <h3>Scenario: "Robot va Svetofor"</h3>
-        <p>Mantiq oddiy: Agar chiroq "Qizil" bo'lsa, robot to'xtab turishi shart. Aks holda (agar "Yashil" yoki boshqa rang bo'lsa), robot harakatini davom ettirishi mumkin. Biz kod orqali bu mantiqni robotning "miyasiga" joylaymiz.</p>
-    </section>
+    <div class="dashboard">
+        <div class="logic-panel">
+            <div class="card code-editor">
+                <p><span style="color: #569cd6;">string</span> chiroq = 
+                <select id="chiroqValue" class="variable-input" onchange="runLogic()">
+                    <option value="Qizil">"Qizil"</option>
+                    <option value="Yashil">"Yashil"</option>
+                </select>;</p>
+                <br>
+                <p><span style="color: #569cd6;">if</span> (chiroq == <span style="color: #ce9178;">"Qizil"</span>)</p>
+                <p>{</p>
+                <p style="padding-left: 20px;">Console.WriteLine(<span style="color: #ce9178;">"To'xtash!"</span>);</p>
+                <p>}</p>
+                <p><span style="color: #569cd6;">else</span></p>
+                <p>{</p>
+                <p style="padding-left: 20px;">Console.WriteLine(<span style="color: #ce9178;">"Harakat!"</span>);</p>
+                <p>}</p>
+            </div>
 
-    <div class="lesson-grid">
-        <div class="panel code-box">
-<pre>
-<span style="color: #569cd6;">string</span> chiroqRang = <span style="color: #ce9178;">"Qizil"</span>;
-
-<span style="color: #569cd6;">if</span> (chiroqRang == <span style="color: #ce9178;">"Qizil"</span>) 
-{
-    Console.WriteLine(<span style="color: #ce9178;">"Robot: To'xtab turibman."</span>);
-}
-<span style="color: #569cd6;">else</span> 
-{
-    Console.WriteLine(<span style="color: #ce9178;">"Robot: Harakatlanyapman."</span>);
-}
-</pre>
+            <div class="card">
+                <div class="translation-toggle">
+                    <h3>Mantiqiy Tarjima</h3>
+                    <button class="btn-toggle" onclick="toggleMode()">REJIMNI ALMASHTIRISH</button>
+                </div>
+                <div id="human-mode">
+                    <p><b>Oddiy til:</b> "Agar svetofor qizil bo'lsa, robot qotib qoladi. Aks holda (yashil bo'lsa), u yo'lni kesib o'tadi."</p>
+                </div>
+                <div id="literal-mode" class="hide">
+                    <p><b>Literal til:</b> <code>if</code> sharti natija <code>true</code> bo'lganda birinchi blokni, <code>false</code> bo'lganda <code>else</code> blokini ishga tushiradi.</p>
+                </div>
+            </div>
         </div>
 
-        <div class="panel trans-view">
-            <div class="toggle-container">
-                <h3>Tarjima va Mantiq</h3>
-                <button class="toggle-btn" onclick="toggleTranslation()">REJIMNI ALMASHTIRISH</button>
+        <div class="viz-window">
+            <div class="status-overlay">
+                <div id="light-indicator" class="indicator"></div>
+                <span id="status-text">Tizim tayyor...</span>
             </div>
-            <div id="human-trans">
-                <p><b>1.</b> Kelin, chiroqni "Qizil" deb olaylik.</p>
-                <p><b>2.</b> <b>Agar</b> chiroq chindan ham Qizil bo'lsa...</p>
-                <p><b>3.</b> ...robot To'xtab turadi.</p>
-                <p><b>4.</b> <b>Aks holda</b> (Qizil bo'lmasa)...</p>
-                <p><b>5.</b> ...robot Yurib ketadi.</p>
-            </div>
-            <div id="literal-trans" class="hide">
-                <p><b>if:</b> Shartli operator, Boolean natijani (true/false) tekshiradi.</p>
-                <p><b>==:</b> Taqqoslash operatori, tenglikni solishtiradi.</p>
-                <p><b>else:</b> Shart `false` chiqqanda bajariladigan blok.</p>
-                <p><b>{ }:</b> Kod Scope (chegarasi).</p>
-            </div>
+
+            <model-viewer id="crosswalk" src="crosswalk.glb" shadow-intensity="1" environment-image="neutral">
+                <model-viewer id="robot" src="robot.glb" auto-rotate-delay="0" camera-controls-disabled></model-viewer>
+                <model-viewer id="traffic-light" src="traffic_light.glb" camera-controls-disabled></model-viewer>
+            </model-viewer>
+        </div>
+
+        <div class="definitions">
+            <div class="def-card"><b>if Operator</b><p>Dasturning asosiy "tanlov" nuqtasi. U faqat rost (true) natijani qidiradi.</p></div>
+            <div class="def-card"><b>== (Comparison)</b><p>Qiymat berish emas, solishtirish. "Ikkala tomon bir-biriga tengmi?" deb so'raydi.</p></div>
+            <div class="def-card"><b>else (Alternative)</b><p>Agar birinchi shart bajarilmasa, dastur yiqilmasligi uchun "B reja" vazifasini o'taydi.</p></div>
+            <div class="def-card"><b>Boolean Logic</b><p>Svetofor faqat ikki holatda bo'lishi mumkin: Shart bajarildi yoki bajarilmadi.</p></div>
         </div>
     </div>
 
-    <div class="viz-box">
-        <div class="scene-label">3D Mantiqiy Sinov: 'if-else' amalda</div>
-        
-        <model-viewer id="traffic-light" src="traffic_light.glb" alt="Traffic Light" auto-rotate environment-image="neutral" style="background: transparent;"> </model-viewer>
-
-        <model-viewer id="robot" src="robot.glb" alt="Robot" auto-rotate camera-controls style="background: transparent;"> </model-viewer>
-    </div>
-
-    <div class="definitions">
-        <h2>Har bir funksiyaga ta'rif:</h2>
-        <div class="def-item">
-            <b>if(shart) { }:</b> Dasturning eng katta shubhasi. U qavs ichidagi shart rost (true) bo'lsagina keyingi jingalak qavs ichidagi kodni bajaradi.
-        </div>
-        <div class="def-item">
-            <b>== (Taqqoslash):</b> "Tengmi?" deb so'raydi. Bitta `=` (qiymat berish) bilan adashtirmaslik kerak. `x = 5` (x ga 5 qiymatini ber), `if(x == 5)` (x 5 ga tengmi?).
-        </div>
-        <div class="def-item">
-            <b>else { }:</b> Bu "Plan B". Agar `if` sharti bajarilmasa, dastur avtomatik ravishda bu blokga tushadi. `else` o'zidan keyin yangi shart talab qilmaydi.
-        </div>
-    </div>
-
-    <footer class="footer">
-        ILM MIZAN • Kelajak Ta'lim Tizimi • Abdulaziz To'lqinov © 2026
+    <footer style="text-align: center; margin-top: 40px; color: #64748b; font-size: 13px;">
+        ILM MIZAN • Interaktiv SaaS Platformasi Prototipi © 2026
     </footer>
 </div>
 
 <script>
-    function toggleTranslation() {
-        document.getElementById('human-trans').classList.toggle('hide');
-        document.getElementById('literal-trans').classList.toggle('hide');
+    function toggleMode() {
+        document.getElementById('human-mode').classList.toggle('hide');
+        document.getElementById('literal-mode').classList.toggle('hide');
     }
 
-    // Keyinchalik, JS orqali 'robot' va 'traffic-light' modellarini 
-    // kodda berilgan 'Qizil' shartiga mos ravishda boshqaramiz. 
-    // Masalan, koddagi "Qizil"ni "Yashil"ga o'zgartirganda robot yurib ketsin.
+    function runLogic() {
+        const val = document.getElementById('chiroqValue').value;
+        const robot = document.getElementById('robot');
+        const indicator = document.getElementById('light-indicator');
+        const statusText = document.getElementById('status-text');
+
+        if (val === "Qizil") {
+            // QIZIL MANTIQI
+            indicator.style.background = "red";
+            statusText.innerText = "Robot: To'xtab turibman (Plan A)";
+            robot.removeAttribute('autoplay'); // Animatsiyani to'xtatish
+            robot.style.transform = "translateX(0px)"; // Joyida qoladi
+        } else {
+            // YASHIL MANTIQI
+            indicator.style.background = "#22c55e";
+            statusText.innerText = "Robot: Harakatlanyapman (Plan B)";
+            robot.setAttribute('autoplay', ''); // Yurish animatsiyasini yoqish
+            robot.style.transform = "translateX(300px)"; // Yo'ldan o'tish
+        }
+    }
+
+    // Birinchi marta ishga tushirish
+    window.onload = runLogic;
 </script>
 
 </body>
