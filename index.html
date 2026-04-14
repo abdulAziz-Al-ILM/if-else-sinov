@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ILM MIZAN | To'liq Dars: if-else</title>
+    <title>ILM MIZAN | To'liq Dars: if-else Simulyatori</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         :root { --dark: #0f172a; --accent: #fbbf24; --gold: #c5a022; --bg: #f8fafc; --text: #334155; }
@@ -23,7 +23,7 @@
         .academic-card h3 { color: var(--accent); margin-top: 0; }
         .academic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 
-        /* Kod Anatomiyasi (Metafora) */
+        /* Kod Anatomiyasi */
         .anatomy-card { background: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
         .anatomy-card h3 { color: var(--dark); margin-top: 0; }
         .robot-role { display: flex; align-items: center; margin-bottom: 15px; padding: 15px; background: #f1f5f9; border-radius: 10px; }
@@ -42,12 +42,17 @@
         .trans-box { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-top: 20px; }
         .toggle-btn { background: var(--dark); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; width: 100%; margin-bottom: 15px; }
 
-        /* 3D Viewer */
-        .viz-window { background: #cbd5e0; height: 500px; border-radius: 20px; position: relative; border: 4px solid white; overflow: hidden; }
-        model-viewer { width: 100%; height: 100%; }
-        /* Robot o'lchamini va joylashuvini qisqartirdik */
-        #robot { position: absolute; bottom: 50px; left: 100px; width: 200px; height: 200px; transition: transform 1.5s ease; }
-        #traffic-light { position: absolute; bottom: 80px; right: 50px; width: 150px; height: 150px; }
+        /* 3D Viewer - Z-INDEX VA POZITSIYALAR TO'G'RILANDI */
+        .viz-window { background: #cbd5e0; height: 500px; border-radius: 20px; position: relative; border: 4px solid white; overflow: hidden; perspective: 1000px; }
+        
+        /* Xarita (Chorraha) eng orqada */
+        #crosswalk { position: absolute; width: 100%; height: 100%; z-index: 1; transform-origin: center center; transition: transform 0.8s ease-in-out; }
+        
+        /* Svetofor o'rtada, uzoqroqda */
+        #traffic-light { position: absolute; top: 25%; right: 25%; width: 120px; height: 250px; z-index: 2; }
+        
+        /* Robot eng oldinda, chorraha chizig'i ustida */
+        #robot { position: absolute; bottom: 15%; left: 15%; width: 180px; height: 180px; z-index: 3; }
 
         /* Tasks */
         .task-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
@@ -70,7 +75,7 @@
     <section class="philosophy-card">
         <div class="quote">"Iroda — bu 'if' (shart) qo'yish qobiliyatidir. Agar sen o'z hayotingga shart qo'ymasang, dunyo senga 'else' (majburiy variant)ni beradi."</div>
         <div class="explanation">
-            <b>Mizan izohi:</b> Hayotda va dasturlashda hech narsa o'z-o'zidan hal bo'lmaydi. Biz kod orqali kompyuterga <b>qoida (if)</b> o'rnatamiz. Bu bizning irodamiz. Agar biz qoida yozmasak yoki xato yozsak, tizim avtomatik ravishda boshqa tomonga, ya'ni biz xohlamagan <b>aks holda (else)</b> holatiga tushib qoladi. Dasturlash — bu nazoratni qo'lga olishdir.
+            <b>Mizan izohi:</b> Hayotda va dasturlashda hech narsa o'z-o'zidan hal bo'lmaydi. Biz kod orqali kompyuterga <b>qoida (if)</b> o'rnatamiz. Bu bizning irodamiz. Agar biz qoida yozmasak, tizim avtomatik ravishda boshqa tomonga, ya'ni biz xohlamagan <b>aks holda (else)</b> holatiga tushib qoladi. Dasturlash — bu jarayonlar ustidan nazoratni qo'lga olishdir.
         </div>
     </section>
 
@@ -78,31 +83,31 @@
         <h3>Akademik Ma'ruza (Nazariy Asoslar)</h3>
         <div class="academic-grid">
             <div>
-                <b>Algoritmik Shoxlanish (Branching):</b> Dastur kodi doim tepadan pastga qarab chiziqli ishlaydi. <code>if-else</code> konstruksiyasi esa bu chiziqni ikkiga bo'ladi. Protsessor bir vaqtning o'zida ikkala yo'ldan yurolmaydi, u faqat bittasini tanlashi shart.
+                <b>Algoritmik Shoxlanish (Branching):</b> Dastur kodi doim tepadan pastga qarab chiziqli ishlaydi. <code>if-else</code> bu chiziqni ikkiga bo'ladi. Protsessor bir vaqtning o'zida ikkala yo'ldan yurolmaydi, u faqat bittasini tanlashi shart.
             </div>
             <div>
-                <b>Case-Sensitivity (Registrga sezgirlik):</b> C# tili o'ta qat'iydir. Katta <b>"A"</b> va kichik <b>"a"</b> xotirada turli xil baytlarda saqlanadi. Shuning uchun "Yur" va "yur" C# uchun mutlaqo begona so'zlardir.
+                <b>Case-Sensitivity (Registrga sezgirlik):</b> C# tili o'ta qat'iydir. Katta <b>"A"</b> va kichik <b>"a"</b> xotirada turli baytlarda saqlanadi. "Yur" va "yur" C# uchun mutlaqo xilma-xil buyruqlardir. Dasturchi bunga juda ehtiyot bo'lishi lozim.
             </div>
         </div>
     </section>
 
     <section class="anatomy-card">
-        <h3>Kod Anatomiyasi: Vazifalar taqsimoti</h3>
+        <h3>Kod Anatomiyasi: Robotlar Ekipaji</h3>
         <p>Kodni shunchaki yozuvlar emas, balki birga ishlayotgan kichik robotlar tizimi deb tasavvur qiling:</p>
         <div class="robot-role">
-            <strong>using System;</strong> <span><b>"Ruxsatnoma":</b> Zavod ishlashi uchun koinot qonunlarini (bazaviy kutubxonalarni) ulash. Busiz hech bir robot ishlamaydi.</span>
+            <strong>using System;</strong> <span><b>"Ruxsatnoma":</b> Koinot qonunlarini (bazaviy kutubxonalarni) ulash. Busiz hech bir robot ishlamaydi.</span>
         </div>
         <div class="robot-role">
             <strong>string buyruq = </strong> <span><b>"Quti":</b> Foydalanuvchi yozgan so'zni saqlab turadigan vaqtincha xotira idishi.</span>
         </div>
         <div class="robot-role">
-            <strong>Console.ReadLine()</strong> <span><b>"Quloq Roboti":</b> Uning yagona vazifasi — jim turib tashqaridan (klaviaturadan) kelayotgan ma'lumotni eshitish.</span>
+            <strong>Console.ReadLine()</strong> <span><b>"Quloq Roboti":</b> Uning yagona vazifasi — jim turib tashqaridan (klaviaturadan) ma'lumot kelishini kutish.</span>
         </div>
         <div class="robot-role">
-            <strong>if (buyruq == "Yur")</strong> <span><b>"Qorovul Roboti":</b> Qutidagi so'zni tekshiradi. Faqat aniq mos kelsagina darvozani ochadi.</span>
+            <strong>if (buyruq == "Yur")</strong> <span><b>"Qorovul Roboti":</b> Qutidagi so'zni tekshiradi. Faqat aniq mos kelsagina o'ziga tegishli qavslar { } ichiga ruxsat beradi.</span>
         </div>
         <div class="robot-role">
-            <strong>Console.WriteLine()</strong> <span><b>"Jarchi Roboti":</b> Natijani ekranga ovoza qiluvchi mexanizm.</span>
+            <strong>Console.WriteLine()</strong> <span><b>"Jarchi Roboti":</b> Qabul qilingan qaror natijasini ekranga ovoza qiluvchi mexanizm.</span>
         </div>
     </section>
 
@@ -137,7 +142,7 @@
 
             <div class="input-panel">
                 <label style="font-weight: bold;">[Terminal] Console.ReadLine() Simulyatsiyasi:</label>
-                <p style="font-size: 12px; color: #64748b;">Eslatma: C# Case-Sensitive. Aynan "Yur" deb katta harf bilan yozib ko'ring.</p>
+                <p style="font-size: 12px; color: #64748b;">Eslatma: Qat'iy "Yur" deb katta harf bilan yozib ko'ring.</p>
                 <input type="text" id="userInput" class="cmd-input" placeholder="Buyruqni yozing..." oninput="handleLogic()">
                 <div style="font-family: monospace; background: black; color: #00ff00; padding: 10px; border-radius: 8px;" id="consoleOutput">
                     > Dastur ishga tushdi. Buyruq kutilmoqda...
@@ -147,22 +152,21 @@
             <div class="trans-box">
                 <button class="toggle-btn" onclick="toggleTranslation()">ODAM TILI / TEXNIK TARJIMA</button>
                 <div id="human-trans">
-                    <b>Odam Tili:</b> "Men senga savol beraman. Eshitgan javobimni 'buyruq' qutisiga solaman. Agar u qutining ichida aynan kattasi bilan 'Yur' degan so'z bo'lsa qadam tashlayman. Boshqa har qanday holatda (masalan, 'yur', 'qoch', 'salom') joyimda kutaman."
+                    <b>Odam Tili:</b> "Men senga savol beraman. Eshitgan javobimni 'buyruq' qutisiga solaman. Agar u qutining ichida aynan kattasi bilan 'Yur' degan so'z bo'lsa qadam tashlayman. Boshqa har qanday holatda kutaman."
                 </div>
                 <div id="literal-trans" class="hide">
                     <b>Texnik Tarjima:</b> <br>
                     <code>ReadLine()</code> - Foydalanuvchi kiritgan ma'lumotni kiritish oqimidan o'qiydi.<br>
-                    <code>if (a == b)</code> - Ikkita string qiymatni <b>qattiq (strict)</b> solishtiradi. Registr (Case) mos kelishi shart.<br>
-                    <code>else</code> - Boolean natija <b>False</b> bo'lgandagi default (standart) yechim.
+                    <code>if (a == b)</code> - Ikkita string qiymatni <b>qattiq (strict)</b> solishtiradi.<br>
+                    <code>else</code> - Boolean natija <b>False</b> bo'lgandagi holat.
                 </div>
             </div>
         </div>
 
         <div class="viz-window">
-            <model-viewer id="crosswalk" src="crosswalk.glb" shadow-intensity="1" environment-image="neutral">
-                <model-viewer id="robot" src="robot.glb" camera-controls-disabled></model-viewer>
-                <model-viewer id="traffic-light" src="traffic_light.glb" camera-controls-disabled></model-viewer>
-            </model-viewer>
+            <model-viewer id="crosswalk" src="crosswalk.glb" shadow-intensity="1" environment-image="neutral" camera-controls-disabled></model-viewer>
+            <model-viewer id="robot" src="robot.glb" camera-controls-disabled></model-viewer>
+            <model-viewer id="traffic-light" src="traffic_light.glb" camera-controls-disabled></model-viewer>
         </div>
     </div>
 
@@ -170,7 +174,7 @@
     <div class="task-list">
         <div class="task">
             <h4>1. "Katta-Kichik xato"</h4>
-            <p>Nega "yur" deb kichkina harfda yozsak tizim uni qabul qilmayapti? Bu xatoni oldini olish uchun C# da qanday metod borligini qidirib toping (Maslahat: <code>.ToLower()</code> metodini o'rganing).</p>
+            <p>Nega "yur" deb kichkina harfda yozsak tizim uni qabul qilmayapti? Bu xatoni oldini olish uchun C# da qanday metod borligini qidirib toping (Maslahat: <code>.ToLower()</code>).</p>
         </div>
         <div class="task">
             <h4>2. Uchlik tanlov</h4>
@@ -178,7 +182,7 @@
         </div>
         <div class="task">
             <h4>3. Matematik Shart</h4>
-            <p>String o'rniga Integer (int) ishlating. Foydalanuvchidan yoshini so'rang. Agar yoshi 18 dan katta bo'lsa tizimga kiritsin.</p>
+            <p>Foydalanuvchidan yoshini so'rang. Agar yoshi 18 dan katta bo'lsa tizimga kiritsin.</p>
         </div>
     </div>
 
@@ -193,22 +197,54 @@
         document.getElementById('literal-trans').classList.toggle('hide');
     }
 
+    let isMoving = false;
+    let rotationAngle = 0;
+
     function handleLogic() {
-        // DIQQAT: JS dagi .toLowerCase() ni olib tashladik! 
-        // Endi u C# kabi qat'iy tekshiradi (Case-Sensitive).
+        if (isMoving) return; // Harakatlanayotganda kiritishni bloklash
+
         const input = document.getElementById('userInput').value;
         const output = document.getElementById('consoleOutput');
         const robot = document.getElementById('robot');
+        const crosswalk = document.getElementById('crosswalk');
 
         if (input === "Yur") {
-            output.innerHTML = "> <b>Robot:</b> Harakatlanyapman!";
+            isMoving = true;
+            output.innerHTML = "> <b>Robot:</b> Mantiq qabul qilindi. Harakatlanmoqdaman!";
             output.style.color = "#00ff00";
+            
+            // 1. Robot oldinga siljiydi
+            robot.style.transition = "transform 1.5s ease-in-out";
             robot.style.transform = "translateX(250px)";
-        } else {
-            // "yur", "YUR", "Qoch" va hokazo hammasi else ga tushadi
-            output.innerHTML = "> <b>Robot:</b> Kutish rejimiga o'tdim. Shart bajarilmadi (False).";
+
+            // 2. Harakat tugagach (1.5s dan keyin) manzarani aylantiramiz
+            setTimeout(() => {
+                // Inputni tozalash
+                document.getElementById('userInput').value = "";
+                output.innerHTML = "> <b>Tizim:</b> Yangi burchakka yetib keldik. Yangi buyruq kutilyapti...";
+                output.style.color = "#fbbf24";
+
+                // Fonni 90 gradusga burish (Loop effekt)
+                rotationAngle -= 90;
+                crosswalk.style.transform = `rotateY(${rotationAngle}deg)`;
+
+                // Robotni tezda o'z joyiga qaytarish (Kamera aylanib orqasiga o'tgandek)
+                robot.style.transition = "none";
+                robot.style.transform = "translateX(0px)";
+
+                isMoving = false;
+            }, 1500);
+
+        } else if (input.length > 0) {
+            output.innerHTML = "> <b>Robot:</b> Noto'g'ri buyruq (Else bloki ishladi).";
             output.style.color = "#ff3333";
+            // O'chirilganda orqaga qaytmasligi uchun joyida qotiramiz
+            robot.style.transition = "none"; 
             robot.style.transform = "translateX(0px)";
+        } else {
+            // Input bo'sh bo'lsa
+            output.innerHTML = "> Dastur ishga tushdi. Buyruq kutilmoqda...";
+            output.style.color = "#00ff00";
         }
     }
 </script>
