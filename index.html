@@ -3,249 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ILM MIZAN | To'liq Dars: if-else Simulyatori</title>
+    <title>ILM MIZAN | C# if-else Simulyatori</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        :root { --dark: #0f172a; --accent: #fbbf24; --gold: #c5a022; --bg: #f8fafc; --text: #334155; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--text); line-height: 1.6; }
-        .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        :root { --dark: #0b0f19; --panel: #1e293b; --accent: #10b981; --gold: #f59e0b; --text: #cbd5e1; --danger: #ef4444; }
+        body { font-family: 'Inter', sans-serif; background: var(--dark); margin: 0; color: var(--text); padding: 20px; overflow-x: hidden; }
+        .app-container { max-width: 1400px; margin: 0 auto; }
         
-        header { text-align: center; padding: 40px 0; background: var(--dark); color: white; border-radius: 20px; margin-bottom: 30px; border-bottom: 5px solid var(--accent); }
-        .mizan-logo { font-size: 14px; letter-spacing: 7px; color: var(--accent); font-weight: bold; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--panel); padding-bottom: 20px; margin-bottom: 20px; }
+        .logo { font-size: 18px; letter-spacing: 4px; color: var(--gold); font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .btn-step { background: var(--accent); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .btn-step:disabled { background: #334155; cursor: not-allowed; }
 
-        /* Falsafa Bloki */
-        .philosophy-card { background: white; border-left: 8px solid var(--accent); padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .quote { font-size: 1.3rem; font-style: italic; color: var(--dark); font-weight: bold; }
-        .explanation { margin-top: 15px; color: #64748b; font-size: 0.95rem; padding-top: 15px; border-top: 1px dashed #cbd5e1; }
+        /* Asosiy Layout */
+        .engine-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 20px; }
+        .panel { background: var(--panel); border-radius: 12px; padding: 20px; border: 1px solid #334155; display: flex; flex-direction: column; position: relative;}
+        .panel-header { font-size: 12px; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; letter-spacing: 2px; }
 
-        /* Akademik Bloki */
-        .academic-card { background: #1e293b; color: #e2e8f0; padding: 30px; border-radius: 15px; margin-bottom: 30px; }
-        .academic-card h3 { color: var(--accent); margin-top: 0; }
-        .academic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-
-        /* Kod Anatomiyasi */
-        .anatomy-card { background: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
-        .anatomy-card h3 { color: var(--dark); margin-top: 0; }
-        .robot-role { display: flex; align-items: center; margin-bottom: 15px; padding: 15px; background: #f1f5f9; border-radius: 10px; }
-        .robot-role strong { color: var(--gold); min-width: 180px; font-family: monospace; font-size: 1.1rem; }
-
-        /* Interactive Section */
-        .interactive-grid { display: grid; grid-template-columns: 1fr; gap: 30px; margin-bottom: 30px; }
-        @media (min-width: 1000px) { .interactive-grid { grid-template-columns: 1.2fr 0.8fr; } }
+        /* 1. Kod bloki */
+        .code-box { font-family: 'Fira Code', monospace; color: #a78bfa; font-size: 15px; line-height: 1.8; }
+        .code-line { display: none; }
         
-        .code-box { background: #1e1e1e; color: #dcdcdc; padding: 25px; border-radius: 15px; font-family: 'Fira Code', monospace; font-size: 14px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        
-        .input-panel { background: #f8fafc; padding: 20px; border-radius: 15px; border: 2px solid var(--accent); margin-top: 20px; }
-        .cmd-input { width: calc(100% - 24px); padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: monospace; font-size: 16px; margin-bottom: 10px; }
-        
-        /* Translation View */
-        .trans-box { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-top: 20px; }
-        .toggle-btn { background: var(--dark); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; width: 100%; margin-bottom: 15px; }
+        /* Terminal / Input */
+        .terminal { display: none; margin-top: 20px; background: #000; border-radius: 8px; padding: 15px; border: 1px solid var(--accent); }
+        .terminal input { background: transparent; border: none; color: var(--accent); font-family: monospace; font-size: 16px; outline: none; width: 150px; border-bottom: 1px solid var(--accent); }
+        .terminal-log { color: #fff; font-family: monospace; font-size: 13px; margin-top: 10px; min-height: 20px; }
 
-        /* 3D Viewer - Z-INDEX VA POZITSIYALAR TO'G'RILANDI */
-        .viz-window { background: #cbd5e0; height: 500px; border-radius: 20px; position: relative; border: 4px solid white; overflow: hidden; perspective: 1000px; }
-        
-        /* Xarita (Chorraha) eng orqada */
-        #crosswalk { position: absolute; width: 100%; height: 100%; z-index: 1; transform-origin: center center; transition: transform 0.8s ease-in-out; }
-        
-        /* Svetofor o'rtada, uzoqroqda */
-        #traffic-light { position: absolute; top: 25%; right: 25%; width: 120px; height: 250px; z-index: 2; }
-        
-        /* Robot eng oldinda, chorraha chizig'i ustida */
-        #robot { position: absolute; bottom: 15%; left: 15%; width: 180px; height: 180px; z-index: 3; }
+        /* 2. 3D Olam */
+        .viz-window { position: relative; height: 500px; background: radial-gradient(circle at top, #1e293b, #0b0f19); border-radius: 12px; overflow: hidden; border: 2px solid #475569; perspective: 1000px; }
+        .model-layer { position: absolute; display: none; transition: all 1s ease; }
+        .model-label { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; border: 1px solid var(--accent); white-space: nowrap; z-index: 10; }
 
-        /* Tasks */
-        .task-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .task { background: white; padding: 20px; border-radius: 15px; border-top: 4px solid var(--accent); }
-        .task h4 { margin-top: 0; }
+        /* Koinot va Hudud CSS'dan (Model kerak emas) */
+        .cyber-grid { position: absolute; width: 200%; height: 200%; bottom: -50%; left: -50%; background-image: linear-gradient(rgba(16, 185, 129, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(16, 185, 129, 0.2) 1px, transparent 1px); background-size: 50px 50px; transform: rotateX(80deg); animation: gridMove 10s linear infinite; }
+        @keyframes gridMove { 0% { transform: rotateX(80deg) translateY(0); } 100% { transform: rotateX(80deg) translateY(50px); } }
+        
+        .cyber-platform { position: absolute; width: 80%; height: 80%; left: 10%; bottom: -20%; background: rgba(15, 23, 42, 0.8); border: 2px solid var(--gold); box-shadow: 0 0 50px rgba(245, 158, 11, 0.2); transform: rotateX(75deg); border-radius: 20px; }
 
-        .hide { display: none; }
-        .footer { text-align: center; padding: 40px; color: #94a3b8; font-size: 13px; }
+        /* 3 va 4. Tarjima bloklari */
+        .trans-box { font-size: 14px; line-height: 1.6; color: #e2e8f0; height: 200px; overflow-y: auto; }
+        .trans-line { display: none; margin-bottom: 10px; padding-left: 10px; border-left: 3px solid var(--accent); }
+        .human-line { border-left-color: var(--gold); }
+
+        /* Editor */
+        #editor-panel { display: none; position: fixed; top: 20px; right: 20px; background: rgba(15, 23, 42, 0.95); border: 2px solid var(--gold); padding: 20px; border-radius: 12px; z-index: 9999; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .editor-control { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .editor-control label { font-size: 11px; color: #94a3b8; margin-bottom: 5px; }
+        .editor-control input, .editor-control select { background: var(--panel); border: 1px solid #334155; color: white; padding: 6px; outline: none; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <header>
-        <div class="mizan-logo">ILM MIZAN • KELAJAK AKADEMIYASI</div>
-        <h1>Mavzu: Shartli Operatorlar (if-else)</h1>
-        <p>Borliqni mantiq bilan boshqarish</p>
+        <div class="logo" onclick="openEditor()">ILM ZAMIN | if-else Engine</div>
+        <button class="btn-step" id="nextBtn" onclick="nextStep()">Kodni yozish (Bosqich 1)</button>
     </header>
 
-    <section class="philosophy-card">
-        <div class="quote">"Iroda — bu 'if' (shart) qo'yish qobiliyatidir. Agar sen o'z hayotingga shart qo'ymasang, dunyo senga 'else' (majburiy variant)ni beradi."</div>
-        <div class="explanation">
-            <b>Mizan izohi:</b> Hayotda va dasturlashda hech narsa o'z-o'zidan hal bo'lmaydi. Biz kod orqali kompyuterga <b>qoida (if)</b> o'rnatamiz. Bu bizning irodamiz. Agar biz qoida yozmasak, tizim avtomatik ravishda boshqa tomonga, ya'ni biz xohlamagan <b>aks holda (else)</b> holatiga tushib qoladi. Dasturlash — bu jarayonlar ustidan nazoratni qo'lga olishdir.
-        </div>
-    </section>
-
-    <section class="academic-card">
-        <h3>Akademik Ma'ruza (Nazariy Asoslar)</h3>
-        <div class="academic-grid">
-            <div>
-                <b>Algoritmik Shoxlanish (Branching):</b> Dastur kodi doim tepadan pastga qarab chiziqli ishlaydi. <code>if-else</code> bu chiziqni ikkiga bo'ladi. Protsessor bir vaqtning o'zida ikkala yo'ldan yurolmaydi, u faqat bittasini tanlashi shart.
-            </div>
-            <div>
-                <b>Case-Sensitivity (Registrga sezgirlik):</b> C# tili o'ta qat'iydir. Katta <b>"A"</b> va kichik <b>"a"</b> xotirada turli baytlarda saqlanadi. "Yur" va "yur" C# uchun mutlaqo xilma-xil buyruqlardir. Dasturchi bunga juda ehtiyot bo'lishi lozim.
-            </div>
-        </div>
-    </section>
-
-    <section class="anatomy-card">
-        <h3>Kod Anatomiyasi: Robotlar Ekipaji</h3>
-        <p>Kodni shunchaki yozuvlar emas, balki birga ishlayotgan kichik robotlar tizimi deb tasavvur qiling:</p>
-        <div class="robot-role">
-            <strong>using System;</strong> <span><b>"Ruxsatnoma":</b> Koinot qonunlarini (bazaviy kutubxonalarni) ulash. Busiz hech bir robot ishlamaydi.</span>
-        </div>
-        <div class="robot-role">
-            <strong>string buyruq = </strong> <span><b>"Quti":</b> Foydalanuvchi yozgan so'zni saqlab turadigan vaqtincha xotira idishi.</span>
-        </div>
-        <div class="robot-role">
-            <strong>Console.ReadLine()</strong> <span><b>"Quloq Roboti":</b> Uning yagona vazifasi — jim turib tashqaridan (klaviaturadan) ma'lumot kelishini kutish.</span>
-        </div>
-        <div class="robot-role">
-            <strong>if (buyruq == "Yur")</strong> <span><b>"Qorovul Roboti":</b> Qutidagi so'zni tekshiradi. Faqat aniq mos kelsagina o'ziga tegishli qavslar { } ichiga ruxsat beradi.</span>
-        </div>
-        <div class="robot-role">
-            <strong>Console.WriteLine()</strong> <span><b>"Jarchi Roboti":</b> Qabul qilingan qaror natijasini ekranga ovoza qiluvchi mexanizm.</span>
-        </div>
-    </section>
-
-    <div class="interactive-grid">
-        <div>
-            <div class="code-box">
-<pre>
-<span style="color: #569cd6;">using</span> System;
-
-<span style="color: #569cd6;">namespace</span> IlmMizan
-{
-    <span style="color: #569cd6;">class</span> RobotFactory
-    {
-        <span style="color: #569cd6;">static void</span> Main()
-        {
-            Console.Write(<span style="color: #ce9178;">"Buyruq kiriting (Yur/To'xta): "</span>);
-            <span style="color: #569cd6;">string</span> buyruq = Console.ReadLine();
-
-            <span style="color: #569cd6;">if</span> (buyruq == <span style="color: #ce9178;">"Yur"</span>) 
-            {
-                Console.WriteLine(<span style="color: #ce9178;">"Harakatlanyapman!"</span>);
-            }
-            <span style="color: #569cd6;">else</span> 
-            {
-                Console.WriteLine(<span style="color: #ce9178;">"Kutish rejimiga o'tdim."</span>);
-            }
-        }
-    }
-}
-</pre>
+    <div class="engine-grid">
+        <div class="panel">
+            <div class="panel-header">C# Kod arxitekturasi</div>
+            <div class="code-box" id="code-container">
+                <div class="code-line step-1"><span style="color:#569cd6">using</span> System;</div>
+                <div class="code-line step-2"><br><span style="color:#569cd6">namespace</span> ILM_Mizan<br>{</div>
+                <div class="code-line step-3" style="margin-left: 20px;"><span style="color:#569cd6">class</span> RobotFactory<br>&nbsp;&nbsp;{</div>
+                <div class="code-line step-4" style="margin-left: 40px;"><span style="color:#569cd6">static void</span> Main()<br>&nbsp;&nbsp;&nbsp;&nbsp;{</div>
+                <div class="code-line step-5" style="margin-left: 60px;">Console.Write(<span style="color:#ce9178">"Buyruq kiriting (Yur/To'xta): "</span>);</div>
+                <div class="code-line step-6" style="margin-left: 60px;"><span style="color:#569cd6">string</span> buyruq = Console.ReadLine();</div>
+                
+                <div class="code-line step-7" style="margin-left: 60px; margin-top: 10px;"><span style="color:#569cd6">if</span> (buyruq == <span style="color:#ce9178">"Yur"</span>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:#4ec9b0">Robot</span>.QadamTashla(); }</div>
+                <div class="code-line step-7" style="margin-left: 60px;"><span style="color:#569cd6">else</span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:#4ec9b0">Robot</span>.Kutish(); }</div>
+                <div class="code-line step-7" style="margin-left: 40px;">}<br>&nbsp;&nbsp;}<br>}</div>
             </div>
 
-            <div class="input-panel">
-                <label style="font-weight: bold;">[Terminal] Console.ReadLine() Simulyatsiyasi:</label>
-                <p style="font-size: 12px; color: #64748b;">Eslatma: Qat'iy "Yur" deb katta harf bilan yozib ko'ring.</p>
-                <input type="text" id="userInput" class="cmd-input" placeholder="Buyruqni yozing..." oninput="handleLogic()">
-                <div style="font-family: monospace; background: black; color: #00ff00; padding: 10px; border-radius: 8px;" id="consoleOutput">
-                    > Dastur ishga tushdi. Buyruq kutilmoqda...
-                </div>
-            </div>
-
-            <div class="trans-box">
-                <button class="toggle-btn" onclick="toggleTranslation()">ODAM TILI / TEXNIK TARJIMA</button>
-                <div id="human-trans">
-                    <b>Odam Tili:</b> "Men senga savol beraman. Eshitgan javobimni 'buyruq' qutisiga solaman. Agar u qutining ichida aynan kattasi bilan 'Yur' degan so'z bo'lsa qadam tashlayman. Boshqa har qanday holatda kutaman."
-                </div>
-                <div id="literal-trans" class="hide">
-                    <b>Texnik Tarjima:</b> <br>
-                    <code>ReadLine()</code> - Foydalanuvchi kiritgan ma'lumotni kiritish oqimidan o'qiydi.<br>
-                    <code>if (a == b)</code> - Ikkita string qiymatni <b>qattiq (strict)</b> solishtiradi.<br>
-                    <code>else</code> - Boolean natija <b>False</b> bo'lgandagi holat.
-                </div>
+            <div class="terminal" id="interactive-terminal">
+                <span style="color: #10b981;">root@ilmmizan:~$</span> Buyruq kiriting: 
+                <input type="text" id="userInput" placeholder="Yur" autocomplete="off" onkeypress="handleEnter(event)">
+                <div class="terminal-log" id="term-log">Dastur kutilmoqda. (Yozib Enter bosing)</div>
             </div>
         </div>
 
         <div class="viz-window">
-            <model-viewer id="crosswalk" src="crosswalk.glb" shadow-intensity="1" environment-image="neutral" camera-controls-disabled></model-viewer>
-            <model-viewer id="robot" src="robot.glb" camera-controls-disabled></model-viewer>
-            <model-viewer id="traffic-light" src="traffic_light.glb" camera-controls-disabled></model-viewer>
+            <model-viewer style="width:100%; height:100%; position:absolute;" camera-controls environment-image="neutral"></model-viewer>
+            
+            <div id="model-1" class="model-layer" style="width: 100%; height: 100%; z-index: 1;">
+                <div class="model-label" style="top: 10px; border-color: var(--gold);">System (Fizika qonunlari)</div>
+                <div class="cyber-grid"></div> 
+            </div>
+
+            <div id="model-2" class="model-layer" style="width: 100%; height: 100%; z-index: 2;">
+                <div class="model-label" style="top: 40px; border-color: var(--gold);">namespace ILM_Mizan</div>
+                <div class="cyber-platform"></div>
+            </div>
+
+            <div id="model-3" class="model-layer" style="width: 350px; height: 350px; left: 25%; bottom: 15%; z-index: 3;">
+                <div class="model-label">class RobotFactory</div>
+                <model-viewer src="factory.glb" style="width:100%; height:100%;"></model-viewer>
+            </div>
+
+            <div id="model-4" class="model-layer" style="width: 100px; height: 100px; left: 45%; bottom: 35%; z-index: 4;">
+                <div class="model-label">Main() Engine</div>
+                <model-viewer src="core.glb" auto-rotate style="width:100%; height:100%;"></model-viewer>
+            </div>
+
+            <div id="model-5" class="model-layer" style="width: 120px; height: 120px; left: 10%; bottom: 10%; z-index: 5;">
+                <div class="model-label" style="background: white; color: black;">💬 "Buyruq kiriting..."</div>
+                <model-viewer src="worker_write.glb" autoplay style="width:100%; height:100%;"></model-viewer>
+            </div>
+            
+            <div id="model-6" class="model-layer" style="width: 120px; height: 120px; left: 70%; bottom: 10%; z-index: 6;">
+                <div class="model-label" style="background: #3b82f6; color: white;">👂 Eshitish jarayoni</div>
+                <model-viewer src="worker_read.glb" autoplay style="width:100%; height:100%;"></model-viewer>
+            </div>
+
+            <div id="model-7" class="model-layer" style="width: 100%; height: 100%; z-index: 7;">
+                <div style="position: absolute; width: 140px; height: 140px; left: 40%; bottom: 5%;">
+                    <div class="model-label" style="background: #ef4444; color: white;" id="guard-label">🔍 Tekshiruvchi (if)</div>
+                    <model-viewer src="guard_if.glb" autoplay style="width:100%; height:100%;"></model-viewer>
+                </div>
+                <div style="position: absolute; width: 150px; height: 150px; left: 40%; bottom: 30%; transition: 1.5s ease;" id="final-product">
+                    <div class="model-label" style="background: var(--gold); color: black;" id="product-label">📦 Mahsulot</div>
+                    <model-viewer src="product_robot.glb" id="prod-viewer" style="width:100%; height:100%;"></model-viewer>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">Texnik Tarjima (Compiler Logic)</div>
+            <div class="trans-box" id="tech-container">
+                <div class="trans-line step-1"><code>using System;</code> - Dastur xotirasi initsializatsiya qilindi.</div>
+                <div class="trans-line step-2"><code>namespace ILM_Mizan</code> - Izolyatsiya qilingan blok ochildi.</div>
+                <div class="trans-line step-3"><code>class RobotFactory</code> - Obyekt yaratish shabloni e'lon qilindi.</div>
+                <div class="trans-line step-4"><code>static void Main()</code> - Dasturning kirish nuqtasi (Entry Point).</div>
+                <div class="trans-line step-5"><code>Console.Write()</code> - Output Stream ga matn yuborildi.</div>
+                <div class="trans-line step-6"><code>Console.ReadLine()</code> - Input Stream dan string kutilmoqda.</div>
+                <div class="trans-line step-7"><code>if (buyruq == "Yur")</code> - Kiritilgan o'zgaruvchi xotiradagi doimiy string bilan <b>qat'iy (strict) solishtirilmoqda</b>.</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">Mantiqiy Tarjima (Metafora)</div>
+            <div class="trans-box" id="human-container">
+                <div class="trans-line human-line step-1">Fizika qonunlari ishga tushdi. Koinot yaratildi.</div>
+                <div class="trans-line human-line step-2">Cheksiz olamdan "ILM_Mizan" deb nomlangan hudud ajratib olindi.</div>
+                <div class="trans-line human-line step-3">Shu hudud ichida "RobotFactory" (Robot Zavodi) qurildi.</div>
+                <div class="trans-line human-line step-4">Korxonaning asosiy quvvat generatori yoqildi.</div>
+                <div class="trans-line human-line step-5">"Console.Write" xodimi hammaga qarab: "Buyruq kiriting" dedi.</div>
+                <div class="trans-line human-line step-6">Boshqaruvchi "Console.ReadLine" javob eshitish uchun quloq soldi.</div>
+                <div class="trans-line human-line step-7"><b>Asosiy jarayon:</b> "Qorovul-IF" eshitilgan so'zni tekshirmoqda. Agar so'z "Yur" bo'lsa darvozani ochadi va tayyor Mahsulot Robot yurib ketadi. Boshqa har qanday so'zda mahsulot yaroqsiz bo'lib joyida qotadi.</div>
+            </div>
         </div>
     </div>
+</div>
 
-    <h2 style="text-align: center; margin-top: 50px;">Mustaqil Amaliyot (Topshiriqlar)</h2>
-    <div class="task-list">
-        <div class="task">
-            <h4>1. "Katta-Kichik xato"</h4>
-            <p>Nega "yur" deb kichkina harfda yozsak tizim uni qabul qilmayapti? Bu xatoni oldini olish uchun C# da qanday metod borligini qidirib toping (Maslahat: <code>.ToLower()</code>).</p>
-        </div>
-        <div class="task">
-            <h4>2. Uchlik tanlov</h4>
-            <p>Kodga <code>else if</code> qo'shing. Agar buyruq "Orqaga" bo'lsa, robot orqaga qaytishi kerakligi haqida mantiq yozing.</p>
-        </div>
-        <div class="task">
-            <h4>3. Matematik Shart</h4>
-            <p>Foydalanuvchidan yoshini so'rang. Agar yoshi 18 dan katta bo'lsa tizimga kiritsin.</p>
-        </div>
+<div id="editor-panel">
+    <h3>🛠 ILM ZAMIN 3D Editor</h3>
+    <div class="editor-control">
+        <label>Modelni tanlang:</label>
+        <select id="edit-model-select" onchange="loadModelStyles()">
+            <option value="model-3">3. Fabrika</option>
+            <option value="model-4">4. Generator (Core)</option>
+            <option value="model-5">5. Xodim Write</option>
+            <option value="model-6">6. Xodim ReadLine</option>
+            <option value="model-7">7. Qorovul va Mahsulot</option>
+        </select>
     </div>
-
-    <footer class="footer">
-        ILM MIZAN • Ta'limda innovatsion ekotizim • Abdulaziz To'lqinov muallifligida ishlab chiqildi © 2026
-    </footer>
+    <div class="editor-control"><label>Left (%):</label><input type="text" id="edit-left" oninput="applyStyles()"></div>
+    <div class="editor-control"><label>Bottom (% yoki px):</label><input type="text" id="edit-bottom" oninput="applyStyles()"></div>
+    <div class="editor-control"><label>Width (px):</label><input type="text" id="edit-width" oninput="applyStyles()"></div>
+    <div class="editor-control"><label>Height (px):</label><input type="text" id="edit-height" oninput="applyStyles()"></div>
+    <button onclick="closeEditor()" style="width: 100%; background: #ef4444; color: white; border: none; padding: 8px; margin-top: 10px; cursor:pointer;">Yopish</button>
 </div>
 
 <script>
-    function toggleTranslation() {
-        document.getElementById('human-trans').classList.toggle('hide');
-        document.getElementById('literal-trans').classList.toggle('hide');
+    let currentStep = 0;
+    const totalSteps = 7;
+
+    function nextStep() {
+        if (currentStep >= totalSteps) return;
+        currentStep++;
+
+        // Elementlarni ko'rsatish
+        const codeLines = document.querySelectorAll(`.code-line.step-${currentStep}`);
+        codeLines.forEach(el => el.style.display = 'block');
+        
+        document.getElementById(`model-${currentStep}`).style.display = 'block';
+        document.querySelector(`#tech-container .step-${currentStep}`).style.display = 'block';
+        document.querySelector(`#human-container .step-${currentStep}`).style.display = 'block';
+
+        // Avtomatik skroll
+        document.getElementById('code-container').scrollTop = 1000;
+        document.getElementById('tech-container').scrollTop = 1000;
+        document.getElementById('human-container').scrollTop = 1000;
+
+        const btn = document.getElementById('nextBtn');
+        if (currentStep === totalSteps) {
+            btn.innerText = "Simulyator Faol!";
+            btn.style.background = "#ef4444";
+            btn.disabled = true;
+            // 7-bosqichda terminalni ochish
+            document.getElementById('interactive-terminal').style.display = 'block';
+            document.getElementById('userInput').focus();
+        } else {
+            btn.innerText = `Kodni yozish (Bosqich ${currentStep + 1})`;
+        }
     }
 
-    let isMoving = false;
-    let rotationAngle = 0;
+    // Terminal Mantig'i
+    function handleEnter(e) {
+        if(e.key === 'Enter') {
+            const val = document.getElementById('userInput').value;
+            const log = document.getElementById('term-log');
+            const guardLabel = document.getElementById('guard-label');
+            const product = document.getElementById('final-product');
+            const prodViewer = document.getElementById('prod-viewer');
 
-    function handleLogic() {
-        if (isMoving) return; // Harakatlanayotganda kiritishni bloklash
+            guardLabel.innerText = `🔍 Tekshirilyapti: "${val}"`;
 
-        const input = document.getElementById('userInput').value;
-        const output = document.getElementById('consoleOutput');
-        const robot = document.getElementById('robot');
-        const crosswalk = document.getElementById('crosswalk');
-
-        if (input === "Yur") {
-            isMoving = true;
-            output.innerHTML = "> <b>Robot:</b> Mantiq qabul qilindi. Harakatlanmoqdaman!";
-            output.style.color = "#00ff00";
-            
-            // 1. Robot oldinga siljiydi
-            robot.style.transition = "transform 1.5s ease-in-out";
-            robot.style.transform = "translateX(250px)";
-
-            // 2. Harakat tugagach (1.5s dan keyin) manzarani aylantiramiz
-            setTimeout(() => {
-                // Inputni tozalash
-                document.getElementById('userInput').value = "";
-                output.innerHTML = "> <b>Tizim:</b> Yangi burchakka yetib keldik. Yangi buyruq kutilyapti...";
-                output.style.color = "#fbbf24";
-
-                // Fonni 90 gradusga burish (Loop effekt)
-                rotationAngle -= 90;
-                crosswalk.style.transform = `rotateY(${rotationAngle}deg)`;
-
-                // Robotni tezda o'z joyiga qaytarish (Kamera aylanib orqasiga o'tgandek)
-                robot.style.transition = "none";
-                robot.style.transform = "translateX(0px)";
-
-                isMoving = false;
-            }, 1500);
-
-        } else if (input.length > 0) {
-            output.innerHTML = "> <b>Robot:</b> Noto'g'ri buyruq (Else bloki ishladi).";
-            output.style.color = "#ff3333";
-            // O'chirilganda orqaga qaytmasligi uchun joyida qotiramiz
-            robot.style.transition = "none"; 
-            robot.style.transform = "translateX(0px)";
-        } else {
-            // Input bo'sh bo'lsa
-            output.innerHTML = "> Dastur ishga tushdi. Buyruq kutilmoqda...";
-            output.style.color = "#00ff00";
+            if(val === "Yur") {
+                log.innerHTML = `<span style="color:#10b981;">[SUCCESS]</span> if() qonuni ishladi. Robot harakatda!`;
+                guardLabel.style.background = "#10b981";
+                guardLabel.innerText = "✅ Ruxsat berildi!";
+                
+                // Mahsulot konveyerdan chiqib ketadi
+                prodViewer.setAttribute('autoplay', '');
+                product.style.transform = "translate(-200px, 100px) scale(1.5)";
+            } else {
+                log.innerHTML = `<span style="color:#ef4444;">[FAIL]</span> else() blokiga tushdi. Buyruq inkor etildi.`;
+                guardLabel.style.background = "#ef4444";
+                guardLabel.innerText = "❌ Xato buyruq!";
+                
+                // Mahsulot qotib qoladi
+                prodViewer.removeAttribute('autoplay');
+                product.style.transform = "translate(0, 0) scale(1)";
+            }
         }
+    }
+
+    // Editor Mantig'i
+    function openEditor() {
+        // Parol formati: HHMMDDMM (Hozirgi vaqt). Masalan 15:45 20.04 bo'lsa -> 15452004
+        const now = new Date();
+        const hr = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const mo = String(now.getMonth() + 1).padStart(2, '0');
+        const pass = hr + min + day + mo;
+
+        const input = prompt("Tahrirlash kodi (HHMMDDMM):");
+        if(input === pass) {
+            document.getElementById('editor-panel').style.display = 'block';
+            loadModelStyles();
+        } else {
+            alert("Xato.");
+        }
+    }
+
+    function closeEditor() { document.getElementById('editor-panel').style.display = 'none'; }
+    function loadModelStyles() {
+        const el = document.getElementById(document.getElementById('edit-model-select').value);
+        document.getElementById('edit-left').value = el.style.left || '0%';
+        document.getElementById('edit-bottom').value = el.style.bottom || '0';
+        document.getElementById('edit-width').value = el.style.width || '100px';
+        document.getElementById('edit-height').value = el.style.height || '100px';
+    }
+    function applyStyles() {
+        const el = document.getElementById(document.getElementById('edit-model-select').value);
+        el.style.left = document.getElementById('edit-left').value;
+        el.style.bottom = document.getElementById('edit-bottom').value;
+        el.style.width = document.getElementById('edit-width').value;
+        el.style.height = document.getElementById('edit-height').value;
     }
 </script>
 
