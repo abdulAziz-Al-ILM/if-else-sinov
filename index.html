@@ -2,68 +2,234 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <title>ILM ZAMIN | 3D Model Skaneri</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ILM ZAMIN | True 3D Logic Engine</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        body { background: #0f172a; color: #10b981; font-family: monospace; padding: 30px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        textarea { width: 100%; height: 250px; background: #1e293b; color: #f59e0b; border: 2px solid #10b981; padding: 15px; font-size: 14px; border-radius: 8px; }
-        model-viewer { width: 300px; height: 300px; background: #334155; margin-top: 20px; border-radius: 8px; display: none; }
-        input[type="file"] { background: #1e293b; color: white; padding: 10px; border: 1px solid #10b981; margin-bottom: 20px; width: 100%; cursor: pointer; }
+        :root { --dark: #0b0f19; --panel: #1e293b; --accent: #10b981; --gold: #f59e0b; --text: #cbd5e1; }
+        body { font-family: monospace; background: var(--dark); margin: 0; color: var(--text); padding: 20px; overflow-x: hidden; }
+        .app-container { max-width: 1400px; margin: 0 auto; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--panel); padding-bottom: 15px; margin-bottom: 20px; }
+        .logo { font-size: 18px; color: var(--gold); font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-step { background: var(--accent); color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: monospace; font-size: 14px;}
+        .btn-step:disabled { background: #334155; }
+
+        .engine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { background: var(--panel); border-radius: 8px; padding: 20px; border: 1px solid #334155; position: relative;}
+        
+        .code-box { color: #a78bfa; font-size: 14px; line-height: 1.8; }
+        .code-line { display: none; }
+        
+        /* Terminal */
+        .terminal { display: none; margin-top: 20px; background: #000; padding: 15px; border-left: 4px solid var(--accent); }
+        .terminal input { background: transparent; border: none; color: var(--accent); font-family: monospace; font-size: 15px; outline: none; width: 100px; border-bottom: 1px solid var(--accent); }
+        .terminal-log { color: #fff; margin-top: 10px; font-size: 12px; }
+
+        /* YAGONA 3D SAHNA */
+        .viz-window { position: relative; height: 500px; background: radial-gradient(circle at top, #1e293b, #0b0f19); border-radius: 8px; overflow: hidden; border: 1px solid #475569; }
+        .model-layer { position: absolute; display: none; transition: transform 1.5s ease-in-out; }
+        .model-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 3px 8px; font-size: 11px; border: 1px solid var(--accent); white-space: nowrap; z-index: 10; }
+
+        /* O'lchamlar Skaner ma'lumotlari asosida to'g'rilandi */
+        #layer-crosswalk { width: 100%; height: 100%; left: 0; bottom: -10%; z-index: 1; }
+        #layer-traffic { width: 80px; height: 250px; right: 25%; bottom: 25%; z-index: 2; }
+        #layer-robot { width: 120px; height: 200px; left: 20%; bottom: 20%; z-index: 3; }
+
+        model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+
+        .trans-box { font-size: 13px; line-height: 1.6; color: #e2e8f0; height: 150px; overflow-y: auto; margin-top: 20px; }
+        .trans-line { display: none; margin-bottom: 10px; padding-left: 10px; border-left: 2px solid var(--gold); }
+
+        #editor-panel { display: none; position: fixed; top: 20px; right: 20px; background: #0b0f19; border: 1px solid var(--gold); padding: 20px; z-index: 9999; width: 250px; }
+        .editor-control { display: flex; flex-direction: column; margin-bottom: 10px; font-size: 11px; }
+        .editor-control input, .editor-control select { background: #1e293b; border: 1px solid #334155; color: white; padding: 5px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🛠 ILM MIZAN: 3D Model Parametrlarini Skanerlash</h2>
-        <p>1. O'zingizdagi <b>crosswalk.glb, robot.glb, traffic_light.glb</b> fayllarini baravariga tanlang.</p>
-        
-        <input type="file" id="fileInput" accept=".glb" multiple>
-        
-        <p>2. Pastdagi natijani to'liq nusxalab, menga yuboring:</p>
-        <textarea id="resultBox">Natija bu yerda chiqadi...</textarea>
-        
-        <model-viewer id="viewer" alt="Scanner"></model-viewer>
+
+<div class="app-container">
+    <header>
+        <div class="logo" onclick="openEditor()">ILM ZAMIN Engine</div>
+        <button class="btn-step" id="nextBtn" onclick="nextStep()">Kodni yozish (Qadam 1)</button>
+    </header>
+
+    <div class="engine-grid">
+        <div class="panel">
+            <div style="color:#94a3b8; font-size:11px; margin-bottom:15px;">// C# COMPILER</div>
+            <div class="code-box">
+                <div class="code-line step-1"><span style="color:#569cd6">using</span> System;</div>
+                <div class="code-line step-2"><span style="color:#569cd6">namespace</span> ILM_Mizan {</div>
+                <div class="code-line step-3" style="margin-left: 20px;"><span style="color:#569cd6">class</span> Tizim {</div>
+                <div class="code-line step-4" style="margin-left: 40px;"><span style="color:#569cd6">static void</span> Main() {</div>
+                <div class="code-line step-5" style="margin-left: 60px;">Console.Write(<span style="color:#ce9178">"Buyruq: "</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#569cd6">string</span> buyruq = Console.ReadLine();</div>
+                <div class="code-line step-6" style="margin-left: 60px; margin-top: 10px;"><span style="color:#569cd6">if</span> (buyruq == <span style="color:#ce9178">"Yur"</span>) { <span style="color:#4ec9b0">Robot</span>.Yur(); }<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#569cd6">else</span> { <span style="color:#4ec9b0">Robot</span>.Kutish(); }</div>
+                <div class="code-line step-6" style="margin-left: 40px;">}<br>&nbsp;&nbsp;} <br>}</div>
+            </div>
+
+            <div class="terminal" id="interactive-terminal">
+                <span style="color: #10b981;">admin@mizan:~$</span> Buyruq: 
+                <input type="text" id="userInput" placeholder="Yur" autocomplete="off" onkeypress="handleEnter(event)">
+                <div class="terminal-log" id="term-log">Dastur kutmoqda...</div>
+            </div>
+
+            <div class="trans-box" id="human-container">
+                <div class="trans-line step-1">Olam yaratildi (System ulangan).</div>
+                <div class="trans-line step-2">Hudud: ILM_Mizan ajratildi.</div>
+                <div class="trans-line step-3">Xarita: Tizim binosi/chorraha barpo etildi.</div>
+                <div class="trans-line step-4">Svetofor: Tizim mantiq dvigateli yoqildi.</div>
+                <div class="trans-line step-5">Robot: Buyruq kutmoqda.</div>
+                <div class="trans-line step-6"><b>Mantiq:</b> 'Yur' desangiz yashil yonib robot yuradi, va kamera 90 gradusga haqiqiy 3D fazoda aylanadi.</div>
+            </div>
+        </div>
+
+        <div class="panel viz-window">
+            
+            <div id="layer-crosswalk" class="model-layer">
+                <div class="model-label">class Tizim (Muhit)</div>
+                <model-viewer id="view-crosswalk" src="crosswalk.glb" camera-orbit="45deg 70deg auto" interaction-prompt="none" camera-controls-disabled></model-viewer>
+            </div>
+
+            <div id="layer-traffic" class="model-layer">
+                <div class="model-label" id="light-label">Main() Mantiq</div>
+                <model-viewer id="view-traffic" src="traffic_light.glb" camera-orbit="45deg 70deg auto" interaction-prompt="none" camera-controls-disabled></model-viewer>
+            </div>
+
+            <div id="layer-robot" class="model-layer">
+                <div class="model-label" id="robot-label">Ijrochi Robot</div>
+                <model-viewer id="view-robot" src="robot.glb" camera-orbit="45deg 70deg auto" interaction-prompt="none" camera-controls-disabled></model-viewer>
+            </div>
+
+        </div>
     </div>
+</div>
 
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const viewer = document.getElementById('viewer');
-        const resultBox = document.getElementById('resultBox');
-        let results = [];
+<div id="editor-panel">
+    <div style="color:var(--gold); font-weight:bold; margin-bottom:10px;">🛠 Editor</div>
+    <div class="editor-control">
+        <select id="edit-model-select" onchange="loadStyles()">
+            <option value="layer-crosswalk">Xarita</option>
+            <option value="layer-traffic">Svetofor</option>
+            <option value="layer-robot">Robot</option>
+        </select>
+    </div>
+    <div class="editor-control"><label>Left (%/px):</label><input type="text" id="edit-left" oninput="applyStyles()"></div>
+    <div class="editor-control"><label>Bottom (%/px):</label><input type="text" id="edit-bottom" oninput="applyStyles()"></div>
+    <div class="editor-control"><label>Width (%/px):</label><input type="text" id="edit-width" oninput="applyStyles()"></div>
+    <div class="editor-control"><label>Height (%/px):</label><input type="text" id="edit-height" oninput="applyStyles()"></div>
+    <button onclick="document.getElementById('editor-panel').style.display='none'" style="width:100%; background:#ef4444; color:#fff; border:none; padding:5px; margin-top:5px;">Yopish</button>
+</div>
 
-        fileInput.addEventListener('change', async (e) => {
-            const files = e.target.files;
-            if (files.length === 0) return;
-            
-            resultBox.value = "Skanerlanmoqda... Iltimos kuting...\n";
-            results = [];
-            viewer.style.display = 'block';
+<script>
+    let currentStep = 0;
+    const totalSteps = 6;
+    let isMoving = false;
+    let currentAngle = 45; // Kameralarning boshlang'ich burchagi
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const url = URL.createObjectURL(file);
+    function nextStep() {
+        if (currentStep >= totalSteps) return;
+        currentStep++;
+
+        document.querySelectorAll(`.step-${currentStep}`).forEach(el => el.style.display = 'block');
+        
+        if(currentStep === 3) document.getElementById('layer-crosswalk').style.display = 'block';
+        if(currentStep === 4) document.getElementById('layer-traffic').style.display = 'block';
+        if(currentStep === 5) document.getElementById('layer-robot').style.display = 'block';
+
+        const btn = document.getElementById('nextBtn');
+        if (currentStep === totalSteps) {
+            btn.innerText = "Dastur Ishlamoqda!";
+            btn.disabled = true;
+            document.getElementById('interactive-terminal').style.display = 'block';
+            document.getElementById('userInput').focus();
+        } else {
+            btn.innerText = `Kodni yozish (Qadam ${currentStep + 1})`;
+        }
+    }
+
+    function syncCameras(angle) {
+        // Asosiy hiyla! Barcha kameralarni yagona 3D fazoda aylantirish.
+        const orbitString = `${angle}deg 70deg auto`;
+        document.getElementById('view-crosswalk').cameraOrbit = orbitString;
+        document.getElementById('view-traffic').cameraOrbit = orbitString;
+        document.getElementById('view-robot').cameraOrbit = orbitString;
+    }
+
+    function handleEnter(e) {
+        if(e.key === 'Enter') {
+            if (isMoving) return;
+
+            const val = document.getElementById('userInput').value;
+            const log = document.getElementById('term-log');
+            const robotLayer = document.getElementById('layer-robot');
+            const lightLabel = document.getElementById('light-label');
+            const robotLabel = document.getElementById('robot-label');
+
+            if(val === "Yur") {
+                isMoving = true;
+                log.innerHTML = `<span style="color:#10b981;">[TRUE]</span> Robot harakatlanmoqda...`;
+                lightLabel.style.background = "#10b981"; lightLabel.innerText = "TRUE";
+                robotLabel.innerText = "Yuryapman";
                 
-                await new Promise((resolve) => {
-                    viewer.src = url;
-                    viewer.addEventListener('load', () => {
-                        const dim = viewer.getDimensions();
-                        const center = viewer.getBoundingBoxCenter();
-                        
-                        results.push(`--- Model: ${file.name} ---`);
-                        results.push(`O'lchamlari (Kenglik/Balandlik/Chuqurlik): X:${dim.x.toFixed(3)}, Y:${dim.y.toFixed(3)}, Z:${dim.z.toFixed(3)}`);
-                        results.push(`Markaziy nuqtasi (Center): X:${center.x.toFixed(3)}, Y:${center.y.toFixed(3)}, Z:${center.z.toFixed(3)}`);
-                        results.push(`Asl nisbati (Aspect Ratio): ${(dim.x / dim.y).toFixed(2)}`);
-                        results.push(``);
-                        
-                        resolve();
-                    }, { once: true });
-                });
+                // CSS orqali oldinga surish
+                robotLayer.style.transform = "translate(250px, -50px)";
+
+                setTimeout(() => {
+                    document.getElementById('userInput').value = "";
+                    log.innerHTML = "Kamera 90° aylanmoqda. Yangi buyruq kutilyapti...";
+                    lightLabel.style.background = "rgba(0,0,0,0.8)"; lightLabel.innerText = "Main() Mantiq";
+                    robotLabel.innerText = "Kutmoqda";
+
+                    // KAMERALARNI SINXRON AYLANTIRISH (Chinakam 3D harakat!)
+                    currentAngle -= 90;
+                    syncCameras(currentAngle);
+
+                    // Robotni asl joyiga qaytarish
+                    robotLayer.style.transition = "none";
+                    robotLayer.style.transform = "translate(0px, 0px)";
+                    
+                    // Kichik tanaffusdan so'ng yana tranzaksiyani yoqish
+                    setTimeout(() => { robotLayer.style.transition = "transform 1.5s ease-in-out"; isMoving = false; }, 50);
+
+                }, 1500);
+
+            } else {
+                log.innerHTML = `<span style="color:#ef4444;">[FALSE]</span> Xato buyruq.`;
+                lightLabel.style.background = "#ef4444"; lightLabel.innerText = "FALSE";
+                robotLayer.style.transform = "translate(0px, 0px)";
             }
-            
-            viewer.style.display = 'none';
-            resultBox.value = results.join('\n');
-            resultBox.value += "✅ BARCHA MODELLAR SKANERLANDI. SHU MATNNI NUSXALAB MENGA TASHLANG.";
-        });
-    </script>
+        }
+    }
+
+    function openEditor() {
+        const now = new Date();
+        const hr = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const pass = hr + min; // Parol endi oson: faqat Soat+Minut (Masalan: 1415)
+        
+        const input = prompt("Editor kodi (HHMM):");
+        if(input === pass) {
+            document.getElementById('editor-panel').style.display = 'block';
+            loadStyles();
+        }
+    }
+    
+    function loadStyles() {
+        const el = document.getElementById(document.getElementById('edit-model-select').value);
+        document.getElementById('edit-left').value = el.style.left;
+        document.getElementById('edit-bottom').value = el.style.bottom;
+        document.getElementById('edit-width').value = el.style.width;
+        document.getElementById('edit-height').value = el.style.height;
+    }
+    
+    function applyStyles() {
+        const el = document.getElementById(document.getElementById('edit-model-select').value);
+        el.style.left = document.getElementById('edit-left').value;
+        el.style.bottom = document.getElementById('edit-bottom').value;
+        el.style.width = document.getElementById('edit-width').value;
+        el.style.height = document.getElementById('edit-height').value;
+    }
+</script>
+
 </body>
 </html>
