@@ -2,280 +2,68 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ILM ZAMIN | Visual Engine (Optimized)</title>
+    <title>ILM ZAMIN | 3D Model Skaneri</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        :root { --dark: #0b0f19; --panel: #1e293b; --accent: #10b981; --gold: #f59e0b; --text: #cbd5e1; --danger: #ef4444; }
-        body { font-family: 'Inter', sans-serif; background: var(--dark); margin: 0; color: var(--text); padding: 20px; overflow-x: hidden; }
-        .app-container { max-width: 1400px; margin: 0 auto; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--panel); padding-bottom: 20px; margin-bottom: 20px; }
-        .logo { font-size: 18px; letter-spacing: 4px; color: var(--gold); font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        .btn-step { background: var(--accent); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .btn-step:disabled { background: #334155; cursor: not-allowed; }
-
-        /* Asosiy Layout */
-        .engine-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 20px; }
-        .panel { background: var(--panel); border-radius: 12px; padding: 20px; border: 1px solid #334155; display: flex; flex-direction: column; position: relative;}
-        .panel-header { font-size: 12px; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; letter-spacing: 2px; }
-
-        /* 1. Kod bloki */
-        .code-box { font-family: 'Fira Code', monospace; color: #a78bfa; font-size: 15px; line-height: 1.8; }
-        .code-line { display: none; }
-        
-        /* Terminal */
-        .terminal { display: none; margin-top: 20px; background: #000; border-radius: 8px; padding: 15px; border: 1px solid var(--accent); }
-        .terminal input { background: transparent; border: none; color: var(--accent); font-family: monospace; font-size: 16px; outline: none; width: 150px; border-bottom: 1px solid var(--accent); }
-        .terminal-log { color: #fff; font-family: monospace; font-size: 13px; margin-top: 10px; min-height: 20px; }
-
-        /* 2. 3D Olam (Optimallashtirilgan) */
-        .viz-window { position: relative; height: 500px; background: radial-gradient(circle at top, #1e293b, #0b0f19); border-radius: 12px; overflow: hidden; border: 2px solid #475569; perspective: 1000px; }
-        .model-layer { position: absolute; display: none; transition: all 1s ease; }
-        .model-label { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; border: 1px solid var(--accent); white-space: nowrap; z-index: 10; }
-
-        /* CSS Koinot va Hudud */
-        .cyber-grid { position: absolute; width: 200%; height: 200%; bottom: -50%; left: -50%; background-image: linear-gradient(rgba(16, 185, 129, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(16, 185, 129, 0.2) 1px, transparent 1px); background-size: 50px 50px; transform: rotateX(80deg); animation: gridMove 10s linear infinite; }
-        @keyframes gridMove { 0% { transform: rotateX(80deg) translateY(0); } 100% { transform: rotateX(80deg) translateY(50px); } }
-        .cyber-platform { position: absolute; width: 80%; height: 80%; left: 10%; bottom: -20%; background: rgba(15, 23, 42, 0.8); border: 2px solid var(--gold); box-shadow: 0 0 50px rgba(245, 158, 11, 0.2); transform: rotateX(75deg); border-radius: 20px; }
-
-        /* Xarita aylanishi uchun */
-        #crosswalk-container { position: absolute; width: 100%; height: 100%; z-index: 3; transform-origin: center center; transition: transform 0.8s ease-in-out; }
-
-        /* 3 va 4. Tarjima bloklari */
-        .trans-box { font-size: 14px; line-height: 1.6; color: #e2e8f0; height: 200px; overflow-y: auto; }
-        .trans-line { display: none; margin-bottom: 10px; padding-left: 10px; border-left: 3px solid var(--accent); }
-        .human-line { border-left-color: var(--gold); }
-
-        /* Maxfiy Editor */
-        #editor-panel { display: none; position: fixed; top: 20px; right: 20px; background: rgba(15, 23, 42, 0.95); border: 2px solid var(--gold); padding: 20px; border-radius: 12px; z-index: 9999; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .editor-control { display: flex; flex-direction: column; margin-bottom: 10px; }
-        .editor-control label { font-size: 11px; color: #94a3b8; margin-bottom: 5px; }
-        .editor-control input, .editor-control select { background: var(--panel); border: 1px solid #334155; color: white; padding: 6px; outline: none; }
+        body { background: #0f172a; color: #10b981; font-family: monospace; padding: 30px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        textarea { width: 100%; height: 250px; background: #1e293b; color: #f59e0b; border: 2px solid #10b981; padding: 15px; font-size: 14px; border-radius: 8px; }
+        model-viewer { width: 300px; height: 300px; background: #334155; margin-top: 20px; border-radius: 8px; display: none; }
+        input[type="file"] { background: #1e293b; color: white; padding: 10px; border: 1px solid #10b981; margin-bottom: 20px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-    <header>
-        <div class="logo" onclick="openEditor()">ILM ZAMIN | if-else Engine</div>
-        <button class="btn-step" id="nextBtn" onclick="nextStep()">Kodni yozish (Bosqich 1)</button>
-    </header>
-
-    <div class="engine-grid">
-        <div class="panel">
-            <div class="panel-header">C# Kod arxitekturasi</div>
-            <div class="code-box" id="code-container">
-                <div class="code-line step-1"><span style="color:#569cd6">using</span> System;</div>
-                <div class="code-line step-2"><br><span style="color:#569cd6">namespace</span> ILM_Mizan<br>{</div>
-                <div class="code-line step-3" style="margin-left: 20px;"><span style="color:#569cd6">class</span> Tizim<br>&nbsp;&nbsp;{</div>
-                <div class="code-line step-4" style="margin-left: 40px;"><span style="color:#569cd6">static void</span> Main()<br>&nbsp;&nbsp;&nbsp;&nbsp;{</div>
-                <div class="code-line step-5" style="margin-left: 60px;">Console.Write(<span style="color:#ce9178">"Buyruq: "</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#569cd6">string</span> buyruq = Console.ReadLine();</div>
-                
-                <div class="code-line step-6" style="margin-left: 60px; margin-top: 10px;"><span style="color:#569cd6">if</span> (buyruq == <span style="color:#ce9178">"Yur"</span>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:#4ec9b0">Robot</span>.QadamTashla(); }</div>
-                <div class="code-line step-6" style="margin-left: 60px;"><span style="color:#569cd6">else</span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span style="color:#4ec9b0">Robot</span>.Kutish(); }</div>
-                <div class="code-line step-6" style="margin-left: 40px;">}<br>&nbsp;&nbsp;}<br>}</div>
-            </div>
-
-            <div class="terminal" id="interactive-terminal">
-                <span style="color: #10b981;">root@ilmmizan:~$</span> Buyruq kiriting: 
-                <input type="text" id="userInput" placeholder="Yur" autocomplete="off" onkeypress="handleEnter(event)">
-                <div class="terminal-log" id="term-log">Tizim tayyor. Kutilmoqda...</div>
-            </div>
-        </div>
-
-        <div class="viz-window">
-            
-            <div id="model-1" class="model-layer" style="width: 100%; height: 100%; z-index: 1;">
-                <div class="model-label" style="top: 10px; border-color: var(--gold);">System (Fizika qonunlari)</div>
-                <div class="cyber-grid"></div> 
-            </div>
-
-            <div id="model-2" class="model-layer" style="width: 100%; height: 100%; z-index: 2;">
-                <div class="model-label" style="top: 40px; border-color: var(--gold);">namespace ILM_Mizan</div>
-                <div class="cyber-platform"></div>
-            </div>
-
-            <div id="model-3" class="model-layer" style="width: 100%; height: 100%; z-index: 3;">
-                <div id="crosswalk-container">
-                    <div class="model-label" style="top: 70px;">class Tizim (Muhit)</div>
-                    <model-viewer src="crosswalk.glb" style="width:100%; height:100%;" camera-controls-disabled></model-viewer>
-                </div>
-            </div>
-
-            <div id="model-4" class="model-layer" style="width: 100px; height: 200px; right: 25%; bottom: 25%; z-index: 4;">
-                <div class="model-label" id="light-label">Main() Dvigateli</div>
-                <model-viewer src="traffic_light.glb" style="width:100%; height:100%;" camera-controls-disabled></model-viewer>
-            </div>
-
-            <div id="model-5" class="model-layer" style="width: 150px; height: 150px; left: 15%; bottom: 15%; z-index: 5; transition: transform 1.5s ease-in-out;">
-                <div class="model-label" style="background: white; color: black;" id="robot-label">Ijrochi Robot</div>
-                <model-viewer src="robot.glb" style="width:100%; height:100%;" camera-controls-disabled></model-viewer>
-            </div>
-            
-            </div>
-
-        <div class="panel">
-            <div class="panel-header">Texnik Tarjima (Compiler Logic)</div>
-            <div class="trans-box" id="tech-container">
-                <div class="trans-line step-1"><code>using System;</code> - Dastur xotirasi initsializatsiya qilindi.</div>
-                <div class="trans-line step-2"><code>namespace ILM_Mizan</code> - Izolyatsiya qilingan blok ochildi.</div>
-                <div class="trans-line step-3"><code>class Tizim</code> - Obyekt yaratish shabloni e'lon qilindi.</div>
-                <div class="trans-line step-4"><code>static void Main()</code> - Dasturning kirish nuqtasi (Entry Point). Svetofor (Mantiq) ishga tushdi.</div>
-                <div class="trans-line step-5"><code>Console.ReadLine()</code> - Standart kirish oqimidan kiritish kutilmoqda.</div>
-                <div class="trans-line step-6"><code>if (buyruq == "Yur")</code> - Kiritilgan o'zgaruvchi xotiradagi doimiy string bilan qat'iy solishtirilmoqda. Boolean natija kutilmoqda.</div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header">Mantiqiy Tarjima (Metafora)</div>
-            <div class="trans-box" id="human-container">
-                <div class="trans-line human-line step-1">Fizika qonunlari ishga tushdi. Koinot yaratildi.</div>
-                <div class="trans-line human-line step-2">Cheksiz olamdan "ILM_Mizan" deb nomlangan maxsus hudud ajratib olindi.</div>
-                <div class="trans-line human-line step-3">Shu hudud ichida Chorraha (Tizim) barpo etildi.</div>
-                <div class="trans-line human-line step-4">Tizimning asosiy tekshiruvchisi — Svetofor ishga tushdi.</div>
-                <div class="trans-line human-line step-5">Ijrochi Robot paydo bo'ldi va bizdan mantiqiy buyruq kutmoqda.</div>
-                <div class="trans-line human-line step-6"><b>Jarayon:</b> Agar biz robotga to'g'ri ("Yur") buyrug'ini bersak, mantiqiy shlyuz ochiladi va robot qadam tashlaydi. Aks holda u joyida qotaveradi.</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="editor-panel">
-    <h3>🛠 ILM ZAMIN 3D Editor</h3>
-    <div class="editor-control">
-        <label>Modelni tanlang:</label>
-        <select id="edit-model-select" onchange="loadModelStyles()">
-            <option value="model-3">3. Xarita (Crosswalk)</option>
-            <option value="model-4">4. Svetofor (Traffic Light)</option>
-            <option value="model-5">5. Robot (Ijrochi)</option>
-        </select>
-    </div>
-    <div class="editor-control"><label>Left (%):</label><input type="text" id="edit-left" oninput="applyStyles()"></div>
-    <div class="editor-control"><label>Bottom (% yoki px):</label><input type="text" id="edit-bottom" oninput="applyStyles()"></div>
-    <div class="editor-control"><label>Width (px yoki %):</label><input type="text" id="edit-width" oninput="applyStyles()"></div>
-    <div class="editor-control"><label>Height (px yoki %):</label><input type="text" id="edit-height" oninput="applyStyles()"></div>
-    <button onclick="closeEditor()" style="width: 100%; background: #ef4444; color: white; border: none; padding: 8px; margin-top: 10px; cursor:pointer;">Yopish</button>
-</div>
-
-<script>
-    let currentStep = 0;
-    const totalSteps = 6;
-    let isMoving = false;
-    let rotationAngle = 0;
-
-    function nextStep() {
-        if (currentStep >= totalSteps) return;
-        currentStep++;
-
-        const codeLines = document.querySelectorAll(`.code-line.step-${currentStep}`);
-        codeLines.forEach(el => el.style.display = 'block');
+    <div class="container">
+        <h2>🛠 ILM MIZAN: 3D Model Parametrlarini Skanerlash</h2>
+        <p>1. O'zingizdagi <b>crosswalk.glb, robot.glb, traffic_light.glb</b> fayllarini baravariga tanlang.</p>
         
-        // Agar 6-bosqich bo'lsa, vizual model shart emas, terminal ishlaydi
-        if(currentStep <= 5) {
-            document.getElementById(`model-${currentStep}`).style.display = 'block';
-        }
+        <input type="file" id="fileInput" accept=".glb" multiple>
+        
+        <p>2. Pastdagi natijani to'liq nusxalab, menga yuboring:</p>
+        <textarea id="resultBox">Natija bu yerda chiqadi...</textarea>
+        
+        <model-viewer id="viewer" alt="Scanner"></model-viewer>
+    </div>
 
-        document.querySelector(`#tech-container .step-${currentStep}`).style.display = 'block';
-        document.querySelector(`#human-container .step-${currentStep}`).style.display = 'block';
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const viewer = document.getElementById('viewer');
+        const resultBox = document.getElementById('resultBox');
+        let results = [];
 
-        const btn = document.getElementById('nextBtn');
-        if (currentStep === totalSteps) {
-            btn.innerText = "Simulyator Faol!";
-            btn.style.background = "#ef4444";
-            btn.disabled = true;
-            document.getElementById('interactive-terminal').style.display = 'block';
-            document.getElementById('userInput').focus();
-        } else {
-            btn.innerText = `Kodni yozish (Bosqich ${currentStep + 1})`;
-        }
-    }
+        fileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (files.length === 0) return;
+            
+            resultBox.value = "Skanerlanmoqda... Iltimos kuting...\n";
+            results = [];
+            viewer.style.display = 'block';
 
-    // Terminal Mantig'i (Yurish va Aylanish loopi bilan)
-    function handleEnter(e) {
-        if(e.key === 'Enter') {
-            if (isMoving) return;
-
-            const val = document.getElementById('userInput').value;
-            const log = document.getElementById('term-log');
-            const robot = document.getElementById('model-5');
-            const robotLabel = document.getElementById('robot-label');
-            const lightLabel = document.getElementById('light-label');
-            const crosswalk = document.getElementById('crosswalk-container');
-
-            if(val === "Yur") {
-                isMoving = true;
-                log.innerHTML = `<span style="color:#10b981;">[TRUE]</span> if() qonuni ishladi. Robot harakatda!`;
-                lightLabel.style.background = "#10b981";
-                lightLabel.innerText = "Svetofor: YASHIL";
-                robotLabel.innerText = "Qadam tashlayapman";
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const url = URL.createObjectURL(file);
                 
-                // Robot oldinga suriladi
-                robot.style.transition = "transform 1.5s ease-in-out";
-                robot.style.transform = "translateX(300px)";
-
-                // Manzilga yetgach, kamera (crosswalk) aylanadi va robot joyiga qaytadi
-                setTimeout(() => {
-                    document.getElementById('userInput').value = "";
-                    log.innerHTML = "Yangi burchakka yetib keldik. Yangi buyruq kutilyapti...";
-                    lightLabel.style.background = "rgba(0,0,0,0.8)";
-                    lightLabel.innerText = "Main() Dvigateli";
-                    robotLabel.innerText = "Kutmoqda...";
-
-                    rotationAngle -= 90;
-                    crosswalk.style.transform = `rotateY(${rotationAngle}deg)`;
-
-                    robot.style.transition = "none";
-                    robot.style.transform = "translateX(0px)";
-                    isMoving = false;
-                }, 1500);
-
-            } else {
-                log.innerHTML = `<span style="color:#ef4444;">[FALSE]</span> else() blokiga tushdi. Buyruq inkor etildi.`;
-                lightLabel.style.background = "#ef4444";
-                lightLabel.innerText = "Svetofor: QIZIL";
-                robotLabel.innerText = "Noto'g'ri buyruq";
-                
-                robot.style.transition = "none";
-                robot.style.transform = "translateX(0px)";
+                await new Promise((resolve) => {
+                    viewer.src = url;
+                    viewer.addEventListener('load', () => {
+                        const dim = viewer.getDimensions();
+                        const center = viewer.getBoundingBoxCenter();
+                        
+                        results.push(`--- Model: ${file.name} ---`);
+                        results.push(`O'lchamlari (Kenglik/Balandlik/Chuqurlik): X:${dim.x.toFixed(3)}, Y:${dim.y.toFixed(3)}, Z:${dim.z.toFixed(3)}`);
+                        results.push(`Markaziy nuqtasi (Center): X:${center.x.toFixed(3)}, Y:${center.y.toFixed(3)}, Z:${center.z.toFixed(3)}`);
+                        results.push(`Asl nisbati (Aspect Ratio): ${(dim.x / dim.y).toFixed(2)}`);
+                        results.push(``);
+                        
+                        resolve();
+                    }, { once: true });
+                });
             }
-        }
-    }
-
-    // Parol va Editor Mantig'i
-    function openEditor() {
-        const now = new Date();
-        const hr = String(now.getHours()).padStart(2, '0');
-        const min = String(now.getMinutes()).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const mo = String(now.getMonth() + 1).padStart(2, '0');
-        const pass = hr + min + day + mo;
-
-        const input = prompt("ILM ZAMIN Engine: Tahrirlash kodi (HHMMDDMM):");
-        if(input === pass) {
-            document.getElementById('editor-panel').style.display = 'block';
-            loadModelStyles();
-        } else {
-            alert("Xato parol.");
-        }
-    }
-
-    function closeEditor() { document.getElementById('editor-panel').style.display = 'none'; }
-    function loadModelStyles() {
-        const el = document.getElementById(document.getElementById('edit-model-select').value);
-        document.getElementById('edit-left').value = el.style.left || '0%';
-        document.getElementById('edit-bottom').value = el.style.bottom || '0';
-        document.getElementById('edit-width').value = el.style.width || '100%';
-        document.getElementById('edit-height').value = el.style.height || '100%';
-    }
-    function applyStyles() {
-        const el = document.getElementById(document.getElementById('edit-model-select').value);
-        el.style.left = document.getElementById('edit-left').value;
-        el.style.bottom = document.getElementById('edit-bottom').value;
-        el.style.width = document.getElementById('edit-width').value;
-        el.style.height = document.getElementById('edit-height').value;
-    }
-</script>
-
+            
+            viewer.style.display = 'none';
+            resultBox.value = results.join('\n');
+            resultBox.value += "✅ BARCHA MODELLAR SKANERLANDI. SHU MATNNI NUSXALAB MENGA TASHLANG.";
+        });
+    </script>
 </body>
 </html>
